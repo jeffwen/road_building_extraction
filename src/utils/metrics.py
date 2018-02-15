@@ -1,7 +1,7 @@
 from torch import nn
 
 
-class BCEDiceLoss(nn.module):
+class BCEDiceLoss(nn.Module):
     def __init__(self, weight=None, size_average=True):
         super().__init__()
 

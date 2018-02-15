@@ -1,3 +1,6 @@
+import warnings
+warnings.simplefilter("ignore", UserWarning)
+
 from skimage import transform
 from torchvision import transforms
 
@@ -33,6 +36,7 @@ class RescaleTarget(object):
 
         new_h, new_w = int(new_h), int(new_w)
 
+        # change the range to 0-1 rather than 0-255, makes it easier to use sigmoid later
         sat_img = transform.resize(sat_img, (new_h, new_w))
 
         map_img = transform.resize(map_img, (new_h, new_w))

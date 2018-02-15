@@ -5,7 +5,12 @@ from skimage import io
 import os
 import pandas as pd
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
+
+if ("SSH_CONNECTION" in os.environ) or ('SSH_TTY' in os.environ):
+    # dont display plot if on remote server
+    matplotlib.use('Agg')
 
 
 class MassRoadBuildingDataset(Dataset):
@@ -70,12 +75,14 @@ def show_map(sat_img, map_img=None, axis=None):
 
 
 # helper function to show a batch
-def show_map_batch(sample_batched):
+def show_map_batch(sample_batched, img_to_show=3, save_file_path=None, as_numpy=False):
     """
-    Show image with landmarks for a batch of samples.
+    Show image with map image overlayed for a batch of samples.
     """
 
-    sat_img_batch, map_img_batch = sample_batched['sat_img'], sample_batched['map_img']
+    # just select 6 images to show per batch
+    sat_img_batch, map_img_batch = sample_batched['sat_img'][:img_to_show, :, :, :],\
+                                   sample_batched['map_img'][:img_to_show, :, :, :]
     batch_size = len(sat_img_batch)
 
     f, ax = plt.subplots(int(np.ceil(batch_size / 3)), 3, figsize=(15, int(np.ceil(batch_size / 3)) * 5))
@@ -88,3 +95,13 @@ def show_map_batch(sample_batched):
         ax[i].axis('off')
         show_map(sat_img=sat_img_batch.numpy()[i, :, :, :].transpose((1, 2, 0)),
                  map_img=map_img_batch.numpy()[i, 0, :, :], axis=ax[i])
+
+    if save_file_path is not None:
+        f.savefig(save_file_path)
+
+    if as_numpy:
+        f.canvas.draw()
+        width, height = f.get_size_inches() * f.get_dpi()
+        mplimage = np.frombuffer(f.canvas.tostring_rgb(), dtype='uint8').reshape(int(height), int(width), 3)
+
+        return mplimage
