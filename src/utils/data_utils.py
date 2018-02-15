@@ -1,20 +1,11 @@
 from __future__ import print_function, division
 from torch.utils.data import Dataset
-from torchvision import transforms, utils
 from skimage import io
 
 import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import warnings
-
-
-warnings.filterwarnings("ignore") # ignore warnings
-
-plt.ion() # interactive mode
-
-local_path = '/Users/jwen/Projects/road_building_extraction/'
 
 
 class MassRoadBuildingDataset(Dataset):
@@ -80,9 +71,11 @@ def show_map(sat_img, map_img=None, axis=None):
 
 # helper function to show a batch
 def show_map_batch(sample_batched):
-    """Show image with landmarks for a batch of samples."""
-    sat_img_batch, map_img_batch = \
-        sample_batched['sat_img'], sample_batched['map_img']
+    """
+    Show image with landmarks for a batch of samples.
+    """
+
+    sat_img_batch, map_img_batch = sample_batched['sat_img'], sample_batched['map_img']
     batch_size = len(sat_img_batch)
 
     f, ax = plt.subplots(int(np.ceil(batch_size / 3)), 3, figsize=(15, int(np.ceil(batch_size / 3)) * 5))
