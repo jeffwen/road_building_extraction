@@ -67,8 +67,8 @@ def main(data_path, batch_size, num_epochs, learning_rate, momentum, print_freq,
 
     # get data
     mass_dataset_train = data_utils.MassRoadBuildingDataset(data_path, data_set, 'train',
-                                                       transform=transforms.Compose([aug.RescaleTarget(400),
-                                                                         aug.RandomCropTarget(350),
+                                                       transform=transforms.Compose([aug.RescaleTarget(368),
+                                                                         aug.RandomCropTarget(328),
                                                                          aug.ToTensorTarget(),
                                                                          aug.NormalizeTarget(mean=[0.5, 0.5, 0.5],
                                                                                              std=[0.5, 0.5, 0.5])]))
