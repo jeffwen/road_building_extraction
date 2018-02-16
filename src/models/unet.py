@@ -14,7 +14,7 @@ class encoding_block(nn.Module):
         if batch_norm:
 
             # reflection padding for same size output as input (reflection padding has shown better results than zero padding)
-            layers = [nn.ReflectionPad2d(padding=(kernel_size -1 )//2),
+            layers = [nn.ReflectionPad2d(padding=(kernel_size -1)//2),
                       nn.Conv2d(in_size, out_size, kernel_size=kernel_size, padding=padding, stride=stride, dilation=dilation),
                       nn.BatchNorm2d(out_size),
                       nn.ReLU(inplace=True),
@@ -48,7 +48,7 @@ class decoding_block(nn.Module):
         super().__init__()
 
         self.conv = encoding_block(in_size, out_size, batch_norm=batch_norm)
-        self.up = nn.Sequential(nn.ReflectionPad2d(padding=1),
+        self.up = nn.Sequential(#nn.ReflectionPad2d(padding=1),
                                 nn.ConvTranspose2d(in_size, out_size, kernel_size=2, stride=2))
 
     def forward(self, input1, input2):
@@ -87,7 +87,7 @@ class UNet(nn.Module):
         self.decode4 = decoding_block(1024, 512)
         self.decode3 = decoding_block(512, 256)
         self.decode2 = decoding_block(256, 128)
-        self.decode1 = decoding_block(128, 64) # no upsampling for this last decode so use encoding structure
+        self.decode1 = decoding_block(128, 64)
 
         # final
         self.final = nn.Conv2d(64, num_classes, kernel_size=1)

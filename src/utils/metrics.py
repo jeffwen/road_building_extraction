@@ -10,12 +10,10 @@ class BCEDiceLoss(nn.Module):
         truth = target.view(-1)
 
         # BCE loss
-        bce_loss = nn.BCELoss()(pred, truth)
+        bce_loss = nn.BCELoss()(pred, truth).double()
 
         # Dice Loss
-        intersection = (pred * truth)
-
-        dice_coef = (2. * intersection.long().sum() + 1) / (pred.long().sum() + truth.long().sum() + 1)
+        dice_coef = (2. * (pred * truth).double().sum() + 1) / (pred.double().sum() + truth.double().sum() + 1)
 
         return bce_loss + (1 - dice_coef)
 
@@ -64,4 +62,4 @@ def dice_coeff(input, target):
 
     loss = (2. * intersection + smooth) /(pred.sum(1) + truth.sum(1) + smooth)
 
-    return loss.mean()
+    return loss.mean().data[0]

@@ -67,8 +67,8 @@ def main(data_path, batch_size, num_epochs, learning_rate, momentum, print_freq,
 
     # get data
     mass_dataset_train = data_utils.MassRoadBuildingDataset(data_path, data_set, 'train',
-                                                       transform=transforms.Compose([aug.RescaleTarget((1000, 1400)),
-                                                                         aug.RandomCropTarget(768),
+                                                       transform=transforms.Compose([aug.RescaleTarget(400),
+                                                                         aug.RandomCropTarget(350),
                                                                          aug.ToTensorTarget(),
                                                                          aug.NormalizeTarget(mean=[0.5, 0.5, 0.5],
                                                                                              std=[0.5, 0.5, 0.5])]))
@@ -79,8 +79,8 @@ def main(data_path, batch_size, num_epochs, learning_rate, momentum, print_freq,
                                                                                              std=[0.5, 0.5, 0.5])]))
 
     # creating loaders
-    train_dataloader = DataLoader(mass_dataset_train, batch_size=batch_size, num_workers=6, shuffle=True)
-    val_dataloader = DataLoader(mass_dataset_val, batch_size=3, num_workers=6, shuffle=False)
+    train_dataloader = DataLoader(mass_dataset_train, batch_size=batch_size, num_workers=4, shuffle=True)
+    val_dataloader = DataLoader(mass_dataset_val, batch_size=3, num_workers=4, shuffle=False)
 
     # loggers
     train_logger = logger.Logger('../logs/run_{}/training'.format(str(run)), print_freq)
@@ -159,8 +159,8 @@ def train(train_loader, model, criterion, optimizer, scheduler, logger, epoch_nu
         loss.backward()
         optimizer.step()
 
-        train_acc.update(metrics.dice_coeff(inputs, labels), inputs.size(0))
-        train_loss.update(loss.data[0], inputs.size(0))
+        train_acc.update(metrics.dice_coeff(outputs, labels), outputs.size(0))
+        train_loss.update(loss.data[0], outputs.size(0))
 
         # tensorboard logging
         if idx % log_iter == 0:
@@ -239,8 +239,8 @@ def validation(valid_loader, model, criterion, logger, epoch_num):
 
         loss = criterion(outputs, labels)
 
-        valid_acc.update(metrics.dice_coeff(inputs, labels), inputs.size(0))
-        valid_loss.update(loss.data[0], inputs.size(0))
+        valid_acc.update(metrics.dice_coeff(outputs, labels), outputs.size(0))
+        valid_loss.update(loss.data[0], outputs.size(0))
 
         # tensorboard logging
         if idx % log_iter == 0:
