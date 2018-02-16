@@ -4,6 +4,7 @@ warnings.simplefilter("ignore", (UserWarning, FutureWarning))
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
 from torchvision import transforms
+from tqdm import tqdm
 
 from utils import logger
 from utils import data_utils
@@ -18,7 +19,7 @@ import argparse
 import shutil
 import os
 
-def main(data_path, batch_size, start_epoch, num_epochs, learning_rate, momentum, print_freq, run, resume):
+def main(data_path, batch_size, num_epochs, learning_rate, momentum, print_freq, run, resume, data_set):
     """
 
     Args:
@@ -41,13 +42,14 @@ def main(data_path, batch_size, start_epoch, num_epochs, learning_rate, momentum
     criterion = metrics.BCEDiceLoss()
 
     # optimizer
-    optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum)
+    optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum, nesterov=True)
 
     # decay LR by a factor of 0.1 every 7 epochs
     lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=15, gamma=0.1)
 
-    # starting loss...
+    # starting params
     best_loss = 999
+    start_epoch = 0
 
     # optionally resume from a checkpoint
     if resume:
@@ -64,14 +66,14 @@ def main(data_path, batch_size, start_epoch, num_epochs, learning_rate, momentum
             print("=> no checkpoint found at '{}'".format(args.resume))
 
     # get data
-    mass_dataset_train = data_utils.MassRoadBuildingDataset(data_path, 'mass_roads', 'train',
+    mass_dataset_train = data_utils.MassRoadBuildingDataset(data_path, data_set, 'train',
                                                        transform=transforms.Compose([aug.RescaleTarget((1000, 1400)),
                                                                          aug.RandomCropTarget(768),
                                                                          aug.ToTensorTarget(),
                                                                          aug.NormalizeTarget(mean=[0.5, 0.5, 0.5],
                                                                                              std=[0.5, 0.5, 0.5])]))
 
-    mass_dataset_val = data_utils.MassRoadBuildingDataset(data_path, 'mass_roads', 'valid',
+    mass_dataset_val = data_utils.MassRoadBuildingDataset(data_path, data_set, 'valid',
                                                      transform=transforms.Compose([aug.ToTensorTarget(),
                                                                          aug.NormalizeTarget(mean=[0.5, 0.5, 0.5],
                                                                                              std=[0.5, 0.5, 0.5])]))
@@ -81,8 +83,8 @@ def main(data_path, batch_size, start_epoch, num_epochs, learning_rate, momentum
     val_dataloader = DataLoader(mass_dataset_val, batch_size=3, num_workers=6, shuffle=False)
 
     # loggers
-    train_logger = logger.Logger('./logs/run_{}/training'.format(str(run)), print_freq)
-    val_logger = logger.Logger('./logs/run_{}/validation'.format(str(run)), print_freq)
+    train_logger = logger.Logger('../logs/run_{}/training'.format(str(run)), print_freq)
+    val_logger = logger.Logger('../logs/run_{}/validation'.format(str(run)), print_freq)
 
     for epoch in range(start_epoch, num_epochs):
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
@@ -131,7 +133,7 @@ def train(train_loader, model, criterion, optimizer, scheduler, logger, epoch_nu
     scheduler.step()
 
     # Iterate over data.
-    for idx, data in enumerate(train_loader):
+    for idx, data in enumerate(tqdm(train_loader, desc="training")):
         # get the inputs
         inputs = data['sat_img']
         labels = data['map_img']
@@ -218,7 +220,7 @@ def validation(valid_loader, model, criterion, logger, epoch_num):
     model.eval()
 
     # Iterate over data.
-    for idx, data in enumerate(valid_loader):
+    for idx, data in enumerate(tqdm(valid_loader, desc='validation')):
         # get the inputs
         inputs = data['sat_img']
         labels = data['map_img']
@@ -233,7 +235,7 @@ def validation(valid_loader, model, criterion, logger, epoch_num):
 
         # forward
         prob_map = model(inputs) # last activation was a sigmoid
-        outputs = (prob_map > 0.3).float()
+        outputs = (prob_map > 0.3).double()
 
         loss = criterion(outputs, labels)
 
@@ -270,7 +272,7 @@ def validation(valid_loader, model, criterion, logger, epoch_num):
 
 
 # create a function to save the model state (https://github.com/pytorch/examples/blob/master/imagenet/main.py)
-def save_checkpoint(state, is_best, filename='./checkpoints/checkpoint.pth.tar'):
+def save_checkpoint(state, is_best, filename='../checkpoints/checkpoint.pth.tar'):
     """
     :param state:
     :param is_best:
@@ -279,32 +281,31 @@ def save_checkpoint(state, is_best, filename='./checkpoints/checkpoint.pth.tar')
     """
     torch.save(state, filename)
     if is_best:
-        shutil.copyfile(filename, 'model_best.pth.tar')
+        shutil.copyfile(filename, '../checkpoints/model_best.pth.tar')
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Road and Building Extraction')
     parser.add_argument('data', metavar='DIR',
-                        help='path to dataset')
+                        help='path to dataset csv')
     parser.add_argument('--epochs', default=100, type=int, metavar='N',
                         help='number of total epochs to run')
-    parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
-                        help='manual epoch number (useful on restarts)')
     parser.add_argument('-b', '--batch-size', default=64, type=int,
                         metavar='N', help='mini-batch size (default: 64)')
     parser.add_argument('--lr', '--learning-rate', default=0.01, type=float,
                         metavar='LR', help='initial learning rate')
     parser.add_argument('--momentum', default=0.9, type=float, metavar='M',
                         help='momentum')
-    parser.add_argument('--resume', default='', type=str, metavar='PATH',
-                        help='path to latest checkpoint (default: none)')
     parser.add_argument('--print-freq', default=4, type=int, metavar='N',
                         help='number of time to log per epoch')
     parser.add_argument('--run', default=0, type=int, metavar='N',
                         help='number of run (for tensorboard logging)')
+    parser.add_argument('--resume', default='', type=str, metavar='PATH',
+                        help='path to latest checkpoint (default: none)')
+    parser.add_argument('--data-set', default='mass_roads', type=str,
+                        help='mass_roads or mass_buildings')
 
     args = parser.parse_args()
 
-    main(args.data, batch_size=args.batch_size, start_epoch=args.start_epoch, num_epochs=args.epochs,
-         learning_rate=args.lr, momentum=args.momentum, print_freq=args.print_freq, run=args.run,
-         resume=args.resume)
+    main(args.data, batch_size=args.batch_size, num_epochs=args.epochs, learning_rate=args.lr,
+         momentum=args.momentum, print_freq=args.print_freq, run=args.run, resume=args.resume, data_set=args.data_set)

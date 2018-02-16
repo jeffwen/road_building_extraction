@@ -122,8 +122,8 @@ class ToTensorTarget(object):
         # torch image: C X H X W
         sat_img = sat_img.transpose((2, 0, 1))
 
-        return {'sat_img': torch.from_numpy(sat_img),
-                'map_img': torch.from_numpy(map_img).unsqueeze(0)} # unsqueeze for the channel dimension
+        return {'sat_img': torch.from_numpy(sat_img).float(),
+                'map_img': torch.from_numpy(map_img).unsqueeze(0).float()} # unsqueeze for the channel dimension
 
 
 class NormalizeTarget(transforms.Normalize):

@@ -33,11 +33,11 @@ class MassRoadBuildingDataset(Dataset):
         return len(self.img_path_df)
 
     def __getitem__(self, idx):
-        sat_img_name = os.path.join('data', self.root_dir, self.train_valid_test, 'sat',
+        sat_img_name = os.path.join('../data', self.root_dir, self.train_valid_test, 'sat',
                                     self.img_path_df.loc[idx, 'sat_img_path'])
         sat_image = io.imread(sat_img_name)
 
-        map_img_name = os.path.join('data', self.root_dir, self.train_valid_test, 'map',
+        map_img_name = os.path.join('../data', self.root_dir, self.train_valid_test, 'map',
                                     self.img_path_df.loc[idx, 'map_img_path'])
         map_image = io.imread(map_img_name)
 
