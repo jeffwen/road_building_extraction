@@ -1,16 +1,18 @@
 from __future__ import print_function, division
 from torch.utils.data import Dataset
 from skimage import io
+from .augmentation import UnNormalize
 
 import os
 import pandas as pd
 import numpy as np
 import matplotlib
-import matplotlib.pyplot as plt
-
 if ("SSH_CONNECTION" in os.environ) or ('SSH_TTY' in os.environ):
     # dont display plot if on remote server
-    matplotlib.use('Agg')
+    matplotlib.use('agg')
+
+import matplotlib.pyplot as plt
+plt.switch_backend('agg')
 
 
 class MassRoadBuildingDataset(Dataset):
@@ -90,11 +92,12 @@ def show_map_batch(sample_batched, img_to_show=3, save_file_path=None, as_numpy=
     f.subplots_adjust(hspace=.05, wspace=.05)
     ax = ax.ravel()
 
+    unorm = UnNormalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+
     for i in range(batch_size):
-        print(type(ax[i]))
         ax[i].axis('off')
-        show_map(sat_img=sat_img_batch.numpy()[i, :, :, :].transpose((1, 2, 0)),
-                 map_img=map_img_batch.numpy()[i, 0, :, :], axis=ax[i])
+        show_map(sat_img=unorm(sat_img_batch.cpu()).numpy()[i, :, :, :].transpose((1, 2, 0)),
+                 map_img=map_img_batch.cpu().numpy()[i, 0, :, :], axis=ax[i])
 
     if save_file_path is not None:
         f.savefig(save_file_path)

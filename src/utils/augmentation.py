@@ -132,3 +132,22 @@ class NormalizeTarget(transforms.Normalize):
     def __call__(self, sample):
         return {'sat_img': transforms.functional.normalize(sample['sat_img'], self.mean, self.std),
                 'map_img': sample['map_img']}
+
+
+# https://discuss.pytorch.org/t/simple-way-to-inverse-transform-normalization/4821/3
+class UnNormalize(object):
+    def __init__(self, mean, std):
+        self.mean = mean
+        self.std = std
+
+    def __call__(self, tensor):
+        """
+        Args:
+            tensor (Tensor): Tensor image of size (C, H, W) to be normalized.
+        Returns:
+            Tensor: Normalized image.
+        """
+        for t, m, s in zip(tensor, self.mean, self.std):
+            t.mul_(s).add_(m)
+            # The normalize code -> t.sub_(m).div_(s)
+        return tensor
