@@ -67,20 +67,20 @@ def main(data_path, batch_size, num_epochs, learning_rate, momentum, print_freq,
 
     # get data
     mass_dataset_train = data_utils.MassRoadBuildingDataset(data_path, data_set, 'train',
-                                                       transform=transforms.Compose([aug.RescaleTarget(368),
-                                                                         aug.RandomCropTarget(328),
+                                                       transform=transforms.Compose([aug.RescaleTarget(268),
+                                                                         aug.RandomCropTarget(228),
                                                                          aug.ToTensorTarget(),
                                                                          aug.NormalizeTarget(mean=[0.5, 0.5, 0.5],
                                                                                              std=[0.5, 0.5, 0.5])]))
 
     mass_dataset_val = data_utils.MassRoadBuildingDataset(data_path, data_set, 'valid',
-                                                     transform=transforms.Compose([aug.ToTensorTarget(),
+                                                     transform=transforms.Compose([aug.RescaleTarget(568), aug.ToTensorTarget(),
                                                                          aug.NormalizeTarget(mean=[0.5, 0.5, 0.5],
                                                                                              std=[0.5, 0.5, 0.5])]))
 
     # creating loaders
-    train_dataloader = DataLoader(mass_dataset_train, batch_size=batch_size, num_workers=4, shuffle=True)
-    val_dataloader = DataLoader(mass_dataset_val, batch_size=3, num_workers=4, shuffle=False)
+    train_dataloader = DataLoader(mass_dataset_train, batch_size=batch_size, num_workers=2, shuffle=True)
+    val_dataloader = DataLoader(mass_dataset_val, batch_size=3, num_workers=2, shuffle=False)
 
     # loggers
     train_logger = logger.Logger('../logs/run_{}/training'.format(str(run)), print_freq)
@@ -235,7 +235,7 @@ def validation(valid_loader, model, criterion, logger, epoch_num):
 
         # forward
         prob_map = model(inputs) # last activation was a sigmoid
-        outputs = (prob_map > 0.3).double()
+        outputs = (prob_map > 0.3).float()
 
         loss = criterion(outputs, labels)
 

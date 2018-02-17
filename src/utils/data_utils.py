@@ -106,5 +106,7 @@ def show_map_batch(sample_batched, img_to_show=3, save_file_path=None, as_numpy=
         f.canvas.draw()
         width, height = f.get_size_inches() * f.get_dpi()
         mplimage = np.frombuffer(f.canvas.tostring_rgb(), dtype='uint8').reshape(int(height), int(width), 3)
+        plt.cla()
+        plt.close(f)
 
         return mplimage
