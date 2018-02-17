@@ -5,4 +5,4 @@ This repository contains the work in progress version of code being used to extr
 
 ![training image with mask](etc/train_img_overlay.png)
 
-The main architecture that will be used is the [U-Net architecture](https://arxiv.org/pdf/1505.04597) that was used initially for biomedical image segmentation, but has since been successful in other tasks such as satellite imagery segmentation.
+The main architecture is the [U-Net architecture](https://arxiv.org/pdf/1505.04597) that was used initially for biomedical image segmentation, but has since been successful in other tasks such as satellite imagery segmentation.
