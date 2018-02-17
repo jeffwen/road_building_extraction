@@ -47,7 +47,7 @@ def main(data_path, batch_size, num_epochs, learning_rate, momentum, print_freq,
     optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum, nesterov=True)
 
     # decay LR by a factor of 0.1 every 7 epochs
-    lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=15, gamma=0.1)
+    lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.1)
 
     # starting params
     best_loss = 999
@@ -288,9 +288,9 @@ if __name__ == '__main__':
                         help='path to dataset csv')
     parser.add_argument('--epochs', default=100, type=int, metavar='N',
                         help='number of total epochs to run')
-    parser.add_argument('-b', '--batch-size', default=64, type=int,
-                        metavar='N', help='mini-batch size (default: 64)')
-    parser.add_argument('--lr', '--learning-rate', default=0.01, type=float,
+    parser.add_argument('-b', '--batch-size', default=6, type=int,
+                        metavar='N', help='mini-batch size (default: 6)')
+    parser.add_argument('--lr', '--learning-rate', default=0.001, type=float,
                         metavar='LR', help='initial learning rate')
     parser.add_argument('--momentum', default=0.9, type=float, metavar='M',
                         help='momentum')

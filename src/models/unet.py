@@ -17,18 +17,18 @@ class encoding_block(nn.Module):
             layers = [nn.ReflectionPad2d(padding=(kernel_size -1)//2),
                       nn.Conv2d(in_size, out_size, kernel_size=kernel_size, padding=padding, stride=stride, dilation=dilation),
                       nn.BatchNorm2d(out_size),
-                      nn.ReLU(inplace=True),
+                      nn.ELU(inplace=True),
                       nn.ReflectionPad2d(padding=(kernel_size - 1) // 2),
                       nn.Conv2d(out_size, out_size, kernel_size=kernel_size, padding=padding, stride=stride, dilation=dilation),
                       nn.BatchNorm2d(out_size),
-                      nn.ReLU(inplace=True)]
+                      nn.ELU(inplace=True)]
         else:
             layers = [nn.ReflectionPad2d(padding=(kernel_size - 1)//2),
                       nn.Conv2d(in_size, out_size, kernel_size=kernel_size, padding=padding, stride=stride, dilation=dilation),
-                      nn.ReLU(inplace=True),
+                      nn.ELU(inplace=True),
                       nn.ReflectionPad2d(padding=(kernel_size - 1) // 2),
                       nn.Conv2d(out_size, out_size, kernel_size=kernel_size, padding=padding, stride=stride, dilation=dilation),
-                      nn.ReLU(inplace=True)]
+                      nn.ELU(inplace=True)]
 
         if dropout:
             layers.append(nn.Dropout())
