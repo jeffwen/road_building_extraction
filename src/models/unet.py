@@ -58,14 +58,9 @@ class decoding_block(nn.Module):
 
     def forward(self, input1, input2):
 
-        print(input2.size())
         output2 = self.up(input2)
-        print(output2.size())
-
-        print(input1.size())
 
         output1 = nn.functional.upsample(input1, output2.size()[2:], mode='bilinear')
-        print(output1.size())
 
         return self.conv(torch.cat([output1, output2], 1))
 
@@ -145,4 +140,4 @@ class UNet(nn.Module):
         final = nn.functional.upsample(self.final(decode1), input.size()[2:], mode='bilinear')
         # print("final: {}".format(final.size()))
 
-        return nn.functional.sigmoid(final) # sigmoid to make it easier to threshold later
+        return final
