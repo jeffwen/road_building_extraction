@@ -44,18 +44,28 @@ class encoding_block(nn.Module):
 
 # decoding block
 class decoding_block(nn.Module):
-    def __init__(self, in_size, out_size, batch_norm=False):
+    def __init__(self, in_size, out_size, batch_norm=False, upsampling=True):
         super().__init__()
 
+        if upsampling:
+            self.up = nn.Sequential(nn.Upsample(mode='bilinear', scale_factor=2),
+                                    nn.Conv2d(in_size, out_size, kernel_size=1))
+
+        else:
+            self.up = nn.ConvTranspose2d(in_size, out_size, kernel_size=2, stride=2)
+
         self.conv = encoding_block(in_size, out_size, batch_norm=batch_norm)
-        self.up = nn.Sequential(#nn.ReflectionPad2d(padding=1),
-                                nn.ConvTranspose2d(in_size, out_size, kernel_size=2, stride=2))
 
     def forward(self, input1, input2):
 
+        print(input2.size())
         output2 = self.up(input2)
+        print(output2.size())
+
+        print(input1.size())
 
         output1 = nn.functional.upsample(input1, output2.size()[2:], mode='bilinear')
+        print(output1.size())
 
         return self.conv(torch.cat([output1, output2], 1))
 
