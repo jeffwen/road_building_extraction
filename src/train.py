@@ -178,7 +178,7 @@ def train(train_loader, model, criterion, optimizer, scheduler, logger, epoch_nu
                 logger.histo_summary(tag + '/grad', value.grad.data.cpu().numpy(), step)
 
             # log the sample images
-            log_img = list(data_utils.show_tensorboard_image(data['sat_img'], data['map_img'], outputs, as_numpy=True))
+            log_img = [data_utils.show_tensorboard_image(data['sat_img'], data['map_img'], outputs, as_numpy=True),]
             logger.image_summary('train_images', log_img, step)
 
     print('Training Loss: {:.4f} Acc: {:.4f}'.format(train_loss.avg, train_acc.avg))
@@ -246,7 +246,7 @@ def validation(valid_loader, model, criterion, logger, epoch_num):
                 logger.scalar_summary(tag, value, step)
 
             # log the sample images
-            log_img = list(data_utils.show_tensorboard_image(data['sat_img'], data['map_img'], outputs, as_numpy=True))
+            log_img = [data_utils.show_tensorboard_image(data['sat_img'], data['map_img'], outputs, as_numpy=True),]
             logger.image_summary('valid_images', log_img, step)
 
     print('Validation Loss: {:.4f} Acc: {:.4f}'.format(valid_loss.avg, valid_acc.avg))
