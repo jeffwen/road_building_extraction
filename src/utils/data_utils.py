@@ -125,7 +125,7 @@ def show_tensorboard_image(sat_img, map_img, out_img, as_numpy=False):
     ax[0].axis('off')
     ax[1].imshow(map_img[0,0,:,:].cpu().numpy())
     ax[1].axis('off')
-    ax[2].imshow(out_img)
+    ax[2].imshow(out_img[0,0,:,:].cpu().numpy())
     ax[2].axis('off')
 
     if as_numpy:
