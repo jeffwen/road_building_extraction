@@ -51,7 +51,7 @@ def jaccard_index(input, target):
 
 # https://github.com/pytorch/pytorch/issues/1249
 def dice_coeff(input, target):
-    num_in_target = target.size(0)
+    num_in_target = input.size(0)
 
     smooth = 1.
 

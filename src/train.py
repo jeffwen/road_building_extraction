@@ -40,8 +40,8 @@ def main(data_path, batch_size, num_epochs, learning_rate, momentum, print_freq,
         model = model.cuda()
 
     # set up binary cross entropy and dice loss
-    # criterion = metrics.BCEDiceLoss()
-    criterion = nn.BCEWithLogitsLoss()
+    criterion = metrics.BCEDiceLoss()
+    # criterion = nn.BCEWithLogitsLoss()
 
     # optimizer
     optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum, nesterov=True)
@@ -94,7 +94,7 @@ def main(data_path, batch_size, num_epochs, learning_rate, momentum, print_freq,
         best_loss = min(valid_metrics['valid_loss'], best_loss)
         save_checkpoint({
             'epoch': epoch,
-            'arch': 'UNet',
+            'arch': 'UNetSmall',
             'state_dict': model.state_dict(),
             'best_loss': best_loss,
             'optimizer': optimizer.state_dict()
@@ -146,6 +146,7 @@ def train(train_loader, model, criterion, optimizer, scheduler, logger, epoch_nu
         # prob_map = model(inputs) # last activation was a sigmoid
         # outputs = (prob_map > 0.3).float()
         outputs = model(inputs)
+        outputs = torch.nn.functional.sigmoid(outputs)
 
         loss = criterion(outputs, labels)
 
@@ -178,7 +179,7 @@ def train(train_loader, model, criterion, optimizer, scheduler, logger, epoch_nu
 
             # log the sample images
             log_img = data_utils.show_tensorboard_image(data['sat_img'], data['map_img'], outputs, as_numpy=True)
-            logger.image_summary('images', log_img, step)
+            logger.image_summary('images', [log_img], step)
 
     print('Training Loss: {:.4f} Acc: {:.4f}'.format(train_loss.avg, train_acc.avg))
     print()
@@ -223,6 +224,7 @@ def validation(valid_loader, model, criterion, logger, epoch_num):
         # prob_map = model(inputs) # last activation was a sigmoid
         # outputs = (prob_map > 0.3).float()
         outputs = model(inputs)
+        outputs = torch.nn.functional.sigmoid(outputs)
 
         loss = criterion(outputs, labels)
 
@@ -245,7 +247,7 @@ def validation(valid_loader, model, criterion, logger, epoch_num):
 
             # log the sample images
             log_img = data_utils.show_tensorboard_image(data['sat_img'], data['map_img'], outputs, as_numpy=True)
-            logger.image_summary('images', log_img, step)
+            logger.image_summary('images', [log_img], step)
 
     print('Validation Loss: {:.4f} Acc: {:.4f}'.format(valid_loss.avg, valid_acc.avg))
     print()
@@ -272,8 +274,8 @@ if __name__ == '__main__':
                         help='path to dataset csv')
     parser.add_argument('--epochs', default=100, type=int, metavar='N',
                         help='number of total epochs to run')
-    parser.add_argument('-b', '--batch-size', default=6, type=int,
-                        metavar='N', help='mini-batch size (default: 6)')
+    parser.add_argument('-b', '--batch-size', default=18, type=int,
+                        metavar='N', help='mini-batch size (default: 18)')
     parser.add_argument('--lr', '--learning-rate', default=0.001, type=float,
                         metavar='LR', help='initial learning rate')
     parser.add_argument('--momentum', default=0.9, type=float, metavar='M',
