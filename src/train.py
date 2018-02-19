@@ -284,8 +284,8 @@ if __name__ == '__main__':
                         help='number of run (for tensorboard logging)')
     parser.add_argument('--resume', default='', type=str, metavar='PATH',
                         help='path to latest checkpoint (default: none)')
-    parser.add_argument('--data-set', default='mass_roads', type=str,
-                        help='mass_roads or mass_buildings')
+    parser.add_argument('--data-set', default='mass_roads_crop', type=str,
+                        help='mass_roads or mass_buildings or mass_roads_crop')
 
     args = parser.parse_args()
 
