@@ -18,12 +18,12 @@ plt.switch_backend('agg')
 class MassRoadBuildingDataset(Dataset):
     """Massachusetts Road and Building dataset"""
 
-    def __init__(self, csv_file, root_dir='mass_roads', train_valid_test='train', transform=None):
+    def __init__(self, csv_file, root_dir='mass_roads_crop', train_valid_test='train', transform=None):
         """
         Args:
             csv_file (string): Path to the csv file with image paths
             train_valid_test (string): 'train', 'valid', or 'test'
-            root_dir (string): 'mass_roads' or 'mass_buildings'
+            root_dir (string): 'mass_roads', 'mass_roads_crop', or 'mass_buildings'
             transform (callable, optional): Optional transform to be applied on a sample.
         """
         self.train_valid_test = train_valid_test
@@ -92,15 +92,41 @@ def show_map_batch(sample_batched, img_to_show=3, save_file_path=None, as_numpy=
     f.subplots_adjust(hspace=.05, wspace=.05)
     ax = ax.ravel()
 
-    unorm = UnNormalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+    # unorm = UnNormalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
 
     for i in range(batch_size):
         ax[i].axis('off')
-        show_map(sat_img=unorm(sat_img_batch.cpu()).numpy()[i, :, :, :].transpose((1, 2, 0)),
+        show_map(sat_img=sat_img_batch.cpu().numpy()[i, :, :, :].transpose((1, 2, 0)),
                  map_img=map_img_batch.cpu().numpy()[i, 0, :, :], axis=ax[i])
 
     if save_file_path is not None:
         f.savefig(save_file_path)
+
+    if as_numpy:
+        f.canvas.draw()
+        width, height = f.get_size_inches() * f.get_dpi()
+        mplimage = np.frombuffer(f.canvas.tostring_rgb(), dtype='uint8').reshape(int(height), int(width), 3)
+        plt.cla()
+        plt.close(f)
+
+        return mplimage
+
+
+def show_tensorboard_image(sat_img, map_img, out_img, as_numpy=False):
+    """
+    Show 3 images side by side for verification on tensorboard. Takes in torch tensors.
+    """
+    f, ax = plt.subplots(1, 3, figsize=(12, 5))
+    f.tight_layout()
+    f.subplots_adjust(hspace=.05, wspace=.05)
+    ax = ax.ravel()
+
+    ax[0].imshow(sat_img[0,:,:,:].cpu().numpy().transpose((1,2,0)))
+    ax[0].axis('off')
+    ax[1].imshow(map_img[0,0,:,:].cpu().numpy())
+    ax[1].axis('off')
+    ax[2].imshow(out_img)
+    ax[2].axis('off')
 
     if as_numpy:
         f.canvas.draw()

@@ -34,7 +34,7 @@ def main(data_path, batch_size, num_epochs, learning_rate, momentum, print_freq,
     since = time.time()
 
     # get model
-    model = unet.UNet()
+    model = unet.UNetSmall()
 
     if torch.cuda.is_available():
         model = model.cuda()
@@ -69,16 +69,10 @@ def main(data_path, batch_size, num_epochs, learning_rate, momentum, print_freq,
 
     # get data
     mass_dataset_train = data_utils.MassRoadBuildingDataset(data_path, data_set, 'train',
-                                                       transform=transforms.Compose([aug.RescaleTarget(380),
-                                                                         aug.RandomCropTarget(278),
-                                                                         aug.ToTensorTarget(),
-                                                                         aug.NormalizeTarget(mean=[0.5, 0.5, 0.5],
-                                                                                             std=[0.5, 0.5, 0.5])]))
+                                                       transform=transforms.Compose([aug.ToTensorTarget()]))
 
     mass_dataset_val = data_utils.MassRoadBuildingDataset(data_path, data_set, 'valid',
-                                                     transform=transforms.Compose([aug.RescaleTarget(468), aug.ToTensorTarget(),
-                                                                         aug.NormalizeTarget(mean=[0.5, 0.5, 0.5],
-                                                                                             std=[0.5, 0.5, 0.5])]))
+                                                     transform=transforms.Compose([aug.ToTensorTarget()]))
 
     # creating loaders
     train_dataloader = DataLoader(mass_dataset_train, batch_size=batch_size, num_workers=2, shuffle=True)
@@ -183,13 +177,8 @@ def train(train_loader, model, criterion, optimizer, scheduler, logger, epoch_nu
                 logger.histo_summary(tag + '/grad', value.grad.data.cpu().numpy(), step)
 
             # log the sample images
-            info = {
-                'target_images': [data_utils.show_map_batch({'sat_img':inputs.data,'map_img':labels.data}, as_numpy=True)],
-                'pred_images': [data_utils.show_map_batch({'sat_img':inputs.data,'map_img':outputs.data}, as_numpy=True)]
-            }
-
-            for tag, images in info.items():
-                logger.image_summary(tag, images, step)
+            log_img = data_utils.show_tensorboard_image(data['sat_img'], data['map_img'], outputs, as_numpy=True)
+            logger.image_summary('images', log_img, step)
 
     print('Training Loss: {:.4f} Acc: {:.4f}'.format(train_loss.avg, train_acc.avg))
     print()
@@ -255,13 +244,8 @@ def validation(valid_loader, model, criterion, logger, epoch_num):
                 logger.scalar_summary(tag, value, step)
 
             # log the sample images
-            info = {
-                'target_images': [data_utils.show_map_batch({'sat_img':inputs.data,'map_img':labels.data}, as_numpy=True)],
-                'pred_images': [data_utils.show_map_batch({'sat_img':inputs.data,'map_img':outputs.data}, as_numpy=True)]
-            }
-
-            for tag, images in info.items():
-                logger.image_summary(tag, images, step)
+            log_img = data_utils.show_tensorboard_image(data['sat_img'], data['map_img'], outputs, as_numpy=True)
+            logger.image_summary('images', log_img, step)
 
     print('Validation Loss: {:.4f} Acc: {:.4f}'.format(valid_loss.avg, valid_acc.avg))
     print()
