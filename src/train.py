@@ -178,8 +178,8 @@ def train(train_loader, model, criterion, optimizer, scheduler, logger, epoch_nu
                 logger.histo_summary(tag + '/grad', value.grad.data.cpu().numpy(), step)
 
             # log the sample images
-            log_img = data_utils.show_tensorboard_image(data['sat_img'], data['map_img'], outputs, as_numpy=True)
-            logger.image_summary('images', [log_img], step)
+            log_img = list(data_utils.show_tensorboard_image(data['sat_img'], data['map_img'], outputs, as_numpy=True))
+            logger.image_summary('train_images', log_img, step)
 
     print('Training Loss: {:.4f} Acc: {:.4f}'.format(train_loss.avg, train_acc.avg))
     print()
@@ -246,8 +246,8 @@ def validation(valid_loader, model, criterion, logger, epoch_num):
                 logger.scalar_summary(tag, value, step)
 
             # log the sample images
-            log_img = data_utils.show_tensorboard_image(data['sat_img'], data['map_img'], outputs, as_numpy=True)
-            logger.image_summary('images', [log_img], step)
+            log_img = list(data_utils.show_tensorboard_image(data['sat_img'], data['map_img'], outputs, as_numpy=True))
+            logger.image_summary('valid_images', log_img, step)
 
     print('Validation Loss: {:.4f} Acc: {:.4f}'.format(valid_loss.avg, valid_acc.avg))
     print()
@@ -274,8 +274,8 @@ if __name__ == '__main__':
                         help='path to dataset csv')
     parser.add_argument('--epochs', default=100, type=int, metavar='N',
                         help='number of total epochs to run')
-    parser.add_argument('-b', '--batch-size', default=18, type=int,
-                        metavar='N', help='mini-batch size (default: 18)')
+    parser.add_argument('-b', '--batch-size', default=16, type=int,
+                        metavar='N', help='mini-batch size (default: 16)')
     parser.add_argument('--lr', '--learning-rate', default=0.001, type=float,
                         metavar='LR', help='initial learning rate')
     parser.add_argument('--momentum', default=0.9, type=float, metavar='M',
