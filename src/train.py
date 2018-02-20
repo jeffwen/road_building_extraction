@@ -47,7 +47,7 @@ def main(data_path, batch_size, num_epochs, learning_rate, momentum, print_freq,
     optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum, nesterov=True)
 
     # decay LR by a factor of 0.1 every 7 epochs
-    lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.1)
+    lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.05)
 
     # starting params
     best_loss = 999
@@ -76,7 +76,7 @@ def main(data_path, batch_size, num_epochs, learning_rate, momentum, print_freq,
 
     # creating loaders
     train_dataloader = DataLoader(mass_dataset_train, batch_size=batch_size, num_workers=2, shuffle=True)
-    val_dataloader = DataLoader(mass_dataset_val, batch_size=1, num_workers=2, shuffle=False)
+    val_dataloader = DataLoader(mass_dataset_val, batch_size=3, num_workers=2, shuffle=False)
 
     # loggers
     train_logger = logger.Logger('../logs/run_{}/training'.format(str(run)), print_freq)
@@ -272,7 +272,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Road and Building Extraction')
     parser.add_argument('data', metavar='DIR',
                         help='path to dataset csv')
-    parser.add_argument('--epochs', default=100, type=int, metavar='N',
+    parser.add_argument('--epochs', default=75, type=int, metavar='N',
                         help='number of total epochs to run')
     parser.add_argument('-b', '--batch-size', default=16, type=int,
                         metavar='N', help='mini-batch size (default: 16)')

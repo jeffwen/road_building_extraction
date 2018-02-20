@@ -44,7 +44,7 @@ class encoding_block(nn.Module):
 
 # decoding block
 class decoding_block(nn.Module):
-    def __init__(self, in_size, out_size, batch_norm=False, upsampling=True):
+    def __init__(self, in_size, out_size, batch_norm=False, upsampling=False):
         super().__init__()
 
         if upsampling:
@@ -180,42 +180,32 @@ class UNetSmall(nn.Module):
         # encoding
         conv1 = self.conv1(input)
         maxpool1 = self.maxpool1(conv1)
-        # print("maxpool1: {}".format(maxpool1.size()))
 
         conv2 = self.conv2(maxpool1)
         maxpool2 = self.maxpool2(conv2)
-        # print("maxpool2: {}".format(maxpool2.size()))
 
 
         conv3 = self.conv3(maxpool2)
         maxpool3 = self.maxpool3(conv3)
-        # print("maxpool3: {}".format(maxpool3.size()))
 
 
         conv4 = self.conv4(maxpool3)
         maxpool4 = self.maxpool4(conv4)
-        # print("maxpool4: {}".format(maxpool4.size()))
 
         # center
         center = self.center(maxpool4)
-        # print("center: {}".format(center.size()))
 
         # decoding
         decode4 = self.decode4(conv4, center)
-        # print("decode4: {}".format(decode4.size()))
 
         decode3 = self.decode3(conv3, decode4)
-        # print("decode3: {}".format(decode3.size()))
 
         decode2 = self.decode2(conv2, decode3)
-        # print("decode2: {}".format(decode2.size()))
 
         decode1 = self.decode1(conv1, decode2)
-        # print("decode1: {}".format(decode1.size()))
 
 
         # final
         final = nn.functional.upsample(self.final(decode1), input.size()[2:], mode='bilinear')
-        # print("final: {}".format(final.size()))
 
         return final
