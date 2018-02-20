@@ -20,6 +20,7 @@ import argparse
 import shutil
 import os
 
+
 def main(data_path, batch_size, num_epochs, learning_rate, momentum, print_freq, run, resume, data_set):
     """
 
@@ -86,6 +87,10 @@ def main(data_path, batch_size, num_epochs, learning_rate, momentum, print_freq,
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
         print('-' * 10)
 
+        # step the learning rate scheduler
+        lr_scheduler.step()
+
+        # run training and validation
         train_metrics = train(train_dataloader, model, criterion, optimizer, lr_scheduler, train_logger, epoch)
         valid_metrics = validation(val_dataloader, model, criterion, val_logger, epoch)
 
