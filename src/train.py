@@ -21,7 +21,7 @@ import shutil
 import os
 
 
-def main(data_path, batch_size, num_epochs, learning_rate, momentum, print_freq, run, resume, data_set):
+def main(data_path, batch_size, num_epochs, start_epoch, learning_rate, momentum, print_freq, run, resume, data_set):
     """
 
     Args:
@@ -52,7 +52,6 @@ def main(data_path, batch_size, num_epochs, learning_rate, momentum, print_freq,
 
     # starting params
     best_loss = 999
-    start_epoch = 0
 
     # optionally resume from a checkpoint
     if resume:
@@ -278,6 +277,8 @@ if __name__ == '__main__':
                         help='path to dataset csv')
     parser.add_argument('--epochs', default=75, type=int, metavar='N',
                         help='number of total epochs to run')
+    parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
+                        help='epoch to start from (used with resume flag')
     parser.add_argument('-b', '--batch-size', default=16, type=int,
                         metavar='N', help='mini-batch size (default: 16)')
     parser.add_argument('--lr', '--learning-rate', default=0.001, type=float,
@@ -295,5 +296,5 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    main(args.data, batch_size=args.batch_size, num_epochs=args.epochs, learning_rate=args.lr,
+    main(args.data, batch_size=args.batch_size, num_epochs=args.epochs, start_epoch=args.start_epoch, learning_rate=args.lr,
          momentum=args.momentum, print_freq=args.print_freq, run=args.run, resume=args.resume, data_set=args.data_set)
