@@ -48,7 +48,7 @@ class decoding_block(nn.Module):
         super().__init__()
 
         if upsampling:
-            self.up = nn.Sequential(nn.Upsample(mode='bilinear', scale_factor=2),
+            self.up = nn.Sequential(nn.Upsample(mode='nearest', scale_factor=2),
                                     nn.Conv2d(in_size, out_size, kernel_size=1))
 
         else:
@@ -60,7 +60,7 @@ class decoding_block(nn.Module):
 
         output2 = self.up(input2)
 
-        output1 = nn.functional.upsample(input1, output2.size()[2:], mode='bilinear')
+        output1 = nn.functional.upsample(input1, output2.size()[2:], mode='nearest')
 
         return self.conv(torch.cat([output1, output2], 1))
 
@@ -136,7 +136,7 @@ class UNet(nn.Module):
         # print("decode1: {}".format(decode1.size()))
 
         # final
-        final = nn.functional.upsample(self.final(decode1), input.size()[2:], mode='bilinear')
+        final = nn.functional.upsample(self.final(decode1), input.size()[2:], mode='nearest')
         # print("final: {}".format(final.size()))
 
         return final
@@ -202,6 +202,6 @@ class UNetSmall(nn.Module):
         decode1 = self.decode1(conv1, decode2)
 
         # final
-        final = nn.functional.upsample(self.final(decode1), input.size()[2:], mode='bilinear')
+        final = nn.functional.upsample(self.final(decode1), input.size()[2:], mode='nearest')
 
         return final
