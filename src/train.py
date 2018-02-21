@@ -58,7 +58,10 @@ def main(data_path, batch_size, num_epochs, start_epoch, learning_rate, momentum
         if os.path.isfile(resume):
             print("=> loading checkpoint '{}'".format(resume))
             checkpoint = torch.load(resume)
-            start_epoch = checkpoint['epoch']
+
+            if checkpoint['epoch'] > start_epoch:
+                start_epoch = checkpoint['epoch']
+
             best_loss = checkpoint['best_loss']
             model.load_state_dict(checkpoint['state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer'])
