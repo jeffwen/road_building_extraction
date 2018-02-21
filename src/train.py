@@ -42,7 +42,6 @@ def main(data_path, batch_size, num_epochs, start_epoch, learning_rate, momentum
 
     # set up binary cross entropy and dice loss
     criterion = metrics.BCEDiceLoss()
-    # criterion = nn.BCEWithLogitsLoss()
 
     # optimizer
     optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum, nesterov=True)
