@@ -46,8 +46,8 @@ def main(data_path, batch_size, num_epochs, start_epoch, learning_rate, momentum
     # optimizer
     optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum, nesterov=True)
 
-    # decay LR by a factor of 0.1 every 7 epochs
-    lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.05)
+    # decay LR
+    lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=8, gamma=0.1)
 
     # starting params
     best_loss = 999
@@ -283,7 +283,7 @@ if __name__ == '__main__':
                         help='epoch to start from (used with resume flag')
     parser.add_argument('-b', '--batch-size', default=16, type=int,
                         metavar='N', help='mini-batch size (default: 16)')
-    parser.add_argument('--lr', '--learning-rate', default=0.001, type=float,
+    parser.add_argument('--lr', '--learning-rate', default=0.1, type=float,
                         metavar='LR', help='initial learning rate')
     parser.add_argument('--momentum', default=0.9, type=float, metavar='M',
                         help='momentum')
