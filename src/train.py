@@ -63,8 +63,7 @@ def main(data_path, batch_size, num_epochs, learning_rate, momentum, print_freq,
             best_loss = checkpoint['best_loss']
             model.load_state_dict(checkpoint['state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer'])
-            print("=> loaded checkpoint '{}' (epoch {})"
-                  .format(resume, checkpoint['epoch']))
+            print("=> loaded checkpoint '{}' (epoch {})".format(resume, checkpoint['epoch']))
         else:
             print("=> no checkpoint found at '{}'".format(args.resume))
 

@@ -44,7 +44,7 @@ class encoding_block(nn.Module):
 
 # decoding block
 class decoding_block(nn.Module):
-    def __init__(self, in_size, out_size, batch_norm=False, upsampling=False):
+    def __init__(self, in_size, out_size, batch_norm=False, upsampling=True):
         super().__init__()
 
         if upsampling:
