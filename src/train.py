@@ -44,10 +44,12 @@ def main(data_path, batch_size, num_epochs, start_epoch, learning_rate, momentum
     criterion = metrics.BCEDiceLoss()
 
     # optimizer
-    optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum, nesterov=True)
+    # optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum, nesterov=True)
+    # optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
     # decay LR
-    lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=8, gamma=0.1)
+    lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=18, gamma=0.1)
 
     # starting params
     best_loss = 999
@@ -283,7 +285,7 @@ if __name__ == '__main__':
                         help='epoch to start from (used with resume flag')
     parser.add_argument('-b', '--batch-size', default=16, type=int,
                         metavar='N', help='mini-batch size (default: 16)')
-    parser.add_argument('--lr', '--learning-rate', default=0.1, type=float,
+    parser.add_argument('--lr', '--learning-rate', default=0.001, type=float,
                         metavar='LR', help='initial learning rate')
     parser.add_argument('--momentum', default=0.9, type=float, metavar='M',
                         help='momentum')
