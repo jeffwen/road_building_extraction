@@ -112,7 +112,7 @@ def show_map_batch(sample_batched, img_to_show=3, save_file_path=None, as_numpy=
         return mplimage
 
 
-def show_tensorboard_image(sat_img, map_img, out_img, as_numpy=False):
+def show_tensorboard_image(sat_img, map_img, out_img, save_file_path=None, as_numpy=False):
     """
     Show 3 images side by side for verification on tensorboard. Takes in torch tensors.
     """
@@ -131,6 +131,9 @@ def show_tensorboard_image(sat_img, map_img, out_img, as_numpy=False):
     ax[1].axis('off')
     ax[2].imshow(out_img[img_num,0,:,:].data.cpu().numpy())
     ax[2].axis('off')
+
+    if save_file_path is not None:
+        f.savefig(save_file_path)
 
     if as_numpy:
         f.canvas.draw()
