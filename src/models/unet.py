@@ -10,18 +10,15 @@ class encoding_block(nn.Module):
     def __init__(self, in_size, out_size, kernel_size=3, padding=0, stride=1, dilation=1, batch_norm=True, dropout=False):
         super().__init__()
 
-
         if batch_norm:
 
             # reflection padding for same size output as input (reflection padding has shown better results than zero padding)
             layers = [nn.ReflectionPad2d(padding=(kernel_size -1)//2),
                       nn.Conv2d(in_size, out_size, kernel_size=kernel_size, padding=padding, stride=stride, dilation=dilation),
-                      #nn.ELU(inplace=True),
                       nn.PReLU(),
                       nn.BatchNorm2d(out_size),
                       nn.ReflectionPad2d(padding=(kernel_size - 1)//2),
                       nn.Conv2d(out_size, out_size, kernel_size=kernel_size, padding=padding, stride=stride, dilation=dilation),
-                      #nn.ELU(inplace=True),
                       nn.PReLU(),
                       nn.BatchNorm2d(out_size),
                       ]
@@ -29,11 +26,9 @@ class encoding_block(nn.Module):
         else:
             layers = [nn.ReflectionPad2d(padding=(kernel_size - 1)//2),
                       nn.Conv2d(in_size, out_size, kernel_size=kernel_size, padding=padding, stride=stride, dilation=dilation),
-                      #nn.ELU(inplace=True),
                       nn.PReLU(),
                       nn.ReflectionPad2d(padding=(kernel_size - 1)//2),
                       nn.Conv2d(out_size, out_size, kernel_size=kernel_size, padding=padding, stride=stride, dilation=dilation),
-                      #nn.ELU(inplace=True),
                       nn.PReLU(),]
 
         if dropout:
